@@ -1,0 +1,5 @@
+# Load test run outputs / scratch
+*.tmp
+/tmp/
+loadtest-*.json
+.DS_Store
