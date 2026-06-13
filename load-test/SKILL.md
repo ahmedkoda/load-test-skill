@@ -45,7 +45,8 @@ What I need from you:
 
 Readiness: a simple URL/API load test runs immediately if Node/npx is present
 (autocannon, no install) or ApacheBench (ab) is installed. Stress/spike/soak
-ramps and multi-step journeys need k6.
+ramps and multi-step journeys need k6 — if your scenario needs it and it's
+missing, I'll offer to install it first.
 
 ⚠️ Authorization: load testing looks like a denial-of-service attack to the
 server. Only run against targets you are explicitly authorized to hit — your own
@@ -114,6 +115,31 @@ Common flags: `--method POST`, `--body '{"key":"value"}'`, `--header "Content-Ty
 The runner prefers **k6** (best for ramps and multi-step journeys) → **autocannon** (zero-install via `npx`, great JSON) → **ab** (preinstalled on macOS) → **hey**. If none beyond `ab` exist and the user wants stress ramps or journey steps, offer to install k6 — read `references/tools.md` for the per-tool capability matrix and install commands.
 
 **Multi-step journeys** (login → navigate → act, not a single URL) need k6, because they require scripted sequencing and token extraction between steps. If the target is a journey and k6 isn't installed, say so and either offer to install it or fall back to the single most important endpoint in the flow — don't silently pretend a single-URL flood covers a journey.
+
+#### k6 needed but missing → offer to install it (don't just fail)
+
+k6 is **not** required for ordinary single-URL/API steady load — autocannon or ab cover that. It becomes required only for **stress/spike/soak ramps** or **multi-step journey replay**. So before assuming it's there, detect it (`command -v k6`). When the user's chosen scenario needs k6 and it isn't installed, **stop and present a clear choice** instead of erroring out or silently downgrading:
+
+```
+This scenario (a <stress/spike/soak ramp | multi-step journey>) needs k6,
+which isn't installed. How do you want to proceed?
+
+  1) Install k6 now  →  brew install k6   (recommended; ~30s, one-time)
+  2) Run a simpler test instead — steady load on one endpoint (no k6 needed)
+  3) Cancel
+```
+
+If they choose install, run the right command for the platform and verify, then continue:
+
+```bash
+# macOS (Homebrew present)
+brew install k6
+# Linux (Debian/Ubuntu) — see references/tools.md for the apt repo steps, or:
+# docker run --rm -i grafana/k6 run - < script.js
+command -v k6 && k6 version   # confirm before proceeding
+```
+
+Treat installing software as a real action: only run the install after the user picks option 1. If Homebrew isn't available, surface that and point to the alternatives in `references/tools.md` (direct download, or the `grafana/k6` Docker image) rather than guessing.
 
 ### 3. Read the results
 
