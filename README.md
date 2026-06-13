@@ -22,14 +22,14 @@ Skills live in `~/.claude/skills/` (available in **every** project on your machi
 **Quick install (personal, all projects):**
 
 ```bash
-git clone https://github.com/<your-username>/load-test-skill.git
+git clone https://github.com/ahmedkoda/load-test-skill.git
 cp -R load-test-skill/load-test ~/.claude/skills/
 ```
 
 **Or use the helper:**
 
 ```bash
-git clone https://github.com/<your-username>/load-test-skill.git
+git clone https://github.com/ahmedkoda/load-test-skill.git
 cd load-test-skill && ./install.sh            # installs to ~/.claude/skills/
 ./install.sh /path/to/project/.claude/skills  # or into a specific project
 ```
