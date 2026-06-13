@@ -66,9 +66,16 @@ After the orientation block, do not assume the target or the load size. **Ask th
 
    If it's a multi-step journey you intend to replay in sequence (not just one captured endpoint), note that this needs k6 (see step 2 and `references/tools.md`); offer to install it or to load-test the single most important endpoint the tour surfaced. Confirm the target back to the user before moving on.
 
-2. **The number of concurrent users second.** Once the target is set, ask how many concurrent users should drive the load — this is the `--concurrency` value. If the user is unsure, suggest a starting point (e.g. 10 for a sanity check, 50–100 for expected traffic) and note that a stress profile can ramp beyond it to find the breaking point.
+2. **The number of concurrent users second — ALWAYS ask, every single run.** Once the target is set, ask how many concurrent users should drive the load — this is the `--concurrency` value. If the user is unsure, suggest a starting point (e.g. 10 for a sanity check, 50–100 for expected traffic) and note that a stress profile can ramp beyond it to find the breaking point.
 
-Only after you have both — the journey/target and the user count — confirm the full config (profile, duration, thresholds, auth for APIs) and proceed. Don't fire a load test with a guessed target or guessed concurrency; both directly shape what the numbers mean and whether the run is authorized.
+   This question is **non-negotiable and non-skippable**. Ask it before *every* load run, even when:
+   - the journey or target was described earlier, reused from a previous request, or carried over from an exploratory tour;
+   - the user said something like "run the flow I asked for before" or "do it again";
+   - you already ran a load test this session (do **not** silently reuse the previous concurrency — re-ask, even if you suggest the last value as the default).
+
+   The concurrency is what makes this a *load* test rather than a single request, and it determines whether the run is safe and authorized — so it must come from the user each time, never inferred. If you ever find yourself about to run `run_load.sh` without having just asked the user for the user count in this exchange, stop and ask first.
+
+Only after you have both — the journey/target and the user count, freshly confirmed this run — proceed to confirm the rest of the config (profile, duration, thresholds, auth for APIs) and run. Don't fire a load test with a guessed target or guessed concurrency; both directly shape what the numbers mean and whether the run is authorized.
 
 ## When to use which load profile
 
@@ -90,6 +97,8 @@ Pin down: **Target** (full URL — page or API); **Method + body + headers** (GE
 > **Authorization gate.** Only load-test targets the user is authorized to hit. Load testing is indistinguishable from a denial-of-service attack from the server's side. Your own dev/staging is fair game; never point this at third-party domains or production without explicit confirmation.
 
 ### 2. Run the test
+
+> **Precondition:** never invoke the runner unless you asked the user for the concurrency (user count) in this exchange and they answered. If you can't point to that answer, go back to intake step 2 and ask.
 
 Use the bundled runner — it auto-detects the best available tool and normalizes output to one JSON shape. Reference it by this skill's directory (shown as the **Base directory** when the skill is invoked); e.g. `<skill-dir>/scripts/run_load.sh`:
 
